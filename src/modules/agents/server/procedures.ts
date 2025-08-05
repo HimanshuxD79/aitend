@@ -1,16 +1,43 @@
 import { db } from "@/db";
 import { agents } from "@/db/schema";
-import { createTRPCRouter, baseProcedure } from "@/trpc/init";
-import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
+import {
+  createTRPCRouter,
+  baseProcedure,
+  protectedprocedure,
+} from "@/trpc/init";
+import { agentsInsertSchema } from "../schemas";
 
 export const agentsRouter = createTRPCRouter({
+  // PUBLIC routes - anyone can view agents
+  getOne: baseProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input }) => {
+      const [existingAgent] = await db
+        .select()
+        .from(agents)
+        .where(eq(agents.id, input.id));
+      return existingAgent || null;
+    }),
+
   getMany: baseProcedure.query(async () => {
     const data = await db.select().from(agents);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate delay
-    // throw new TRPCError({
-    //   code: "INTERNAL_SERVER_ERROR",
-    //   message: "An error occurred while fetching agents",
-    // });
     return data;
   }),
+
+  // PROTECTED route - only logged-in users can create agents
+  create: protectedprocedure
+    .input(agentsInsertSchema)
+    .mutation(async ({ input, ctx }) => {
+      // Use the authenticated user's ID from the session
+      const [createdAgent] = await db
+        .insert(agents)
+        .values({
+          ...input,
+          userId: ctx.auth.user.id,
+        })
+        .returning();
+      return createdAgent;
+    }),
 });
