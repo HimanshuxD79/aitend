@@ -5,7 +5,8 @@ import { useTRPC } from "@/trpc/client";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
+import { DataTable } from "../components/data-table";
+import { columns, Payment } from "../components/columns";
 export const AgentsView = () => {
   const trpc = useTRPC();
   const { data, isLoading, error } = useQuery(
@@ -66,8 +67,21 @@ export const AgentsView = () => {
       </div>
     );
   }
-
-  return <div>{JSON.stringify(data, null, 2)}</div>;
+  const mockData: Payment[] = [
+    {
+      id: "728ed52f",
+      amount: 100,
+      status: "pending",
+      email: "m@example.com",
+    },
+    // ...
+  ];
+  return (
+    <div className="flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4">
+      <DataTable columns={columns} data={data} />
+      {/* {JSON.stringify(data, null, 2)} */}
+    </div>
+  );
 };
 export const AgentsViewLoading = () => {
   return (
