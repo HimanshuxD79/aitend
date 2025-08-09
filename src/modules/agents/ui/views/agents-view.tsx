@@ -1,16 +1,21 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DataTable } from "../components/data-table";
-import { columns, Payment } from "../components/columns";
+import { columns } from "../components/columns";
+import { useAgentsFilters } from "../../hooks/use-agents-filters";
+import { DataPagination } from "../components/data-pagination";
+import { useRouter } from "next/navigation";
 export const AgentsView = () => {
+  const router = useRouter();
+  const [filters, setFilters] = useAgentsFilters();
   const trpc = useTRPC();
-  const { data, isLoading, error } = useQuery(
-    trpc.agents.getMany.queryOptions()
+  const { data, isLoading, error } = useSuspenseQuery(
+    trpc.agents.getMany.queryOptions({ ...filters })
   );
 
   if (isLoading) {
@@ -57,7 +62,7 @@ export const AgentsView = () => {
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!data || data.items.length === 0) {
     return (
       <div className="text-center py-8">
         <h3 className="text-lg font-medium">No agents found</h3>
@@ -67,19 +72,21 @@ export const AgentsView = () => {
       </div>
     );
   }
-  const mockData: Payment[] = [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-    },
-    // ...
-  ];
+
   return (
     <div className="flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4">
-      <DataTable columns={columns} data={data} />
-      {/* {JSON.stringify(data, null, 2)} */}
+      <DataTable
+        columns={columns}
+        data={data.items}
+        onRowClick={(row) => router.push(`/agents/${row.id}`)}
+      />
+      <DataPagination
+        page={filters.page}
+        totalPages={data.totalPages}
+        onPageChange={(page) => {
+          setFilters((prev) => ({ ...prev, page }));
+        }}
+      />
     </div>
   );
 };
