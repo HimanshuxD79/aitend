@@ -3,7 +3,7 @@ import { AgentGetOne } from "../../types";
 import { useTRPC } from "@/trpc/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { agentsInsertSchema } from "../../schemas";
+import { agentsInsertSchema, agentsUpdateSchema } from "../../schemas";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -77,11 +77,43 @@ export const AgentForm = ({
     },
   });
 
+  const updateAgent = useMutation({
+    mutationFn: async (data: z.infer<typeof agentsUpdateSchema>) => {
+      // Use the vanilla tRPC client directly
+      return await trpcClient.agents.update.mutate(data);
+    },
+    onSuccess: async () => {
+      // Invalidate the agents queries using queryClient
+      await queryClient.invalidateQueries({
+        queryKey: utils.agents.getMany.queryOptions().queryKey,
+      });
+      if (initialValues?.id) {
+        await queryClient.invalidateQueries({
+          queryKey: utils.agents.getOne.queryOptions({ id: initialValues.id })
+            .queryKey,
+        });
+      }
+      toast.success("Agent updated successfully!");
+      onSuccess?.();
+    },
+    onError: (error: Error) => {
+      if (error.message.includes("UNAUTHORIZED")) {
+        toast.error("Please sign in to create agents");
+      } else {
+        toast.error(`Error creating agent: ${error.message}`);
+      }
+      console.error("Error creating agent:", error);
+    },
+  });
   const isEdit = !!initialValues?.id;
-
+  const isPending = createAgent.isPending || updateAgent.isPending;
   const onSubmit = async (data: z.infer<typeof agentsInsertSchema>) => {
     if (isEdit) {
-      console.log("TODO: UpdateAgent");
+      const updateData: z.infer<typeof agentsUpdateSchema> = {
+        ...data,
+        id: initialValues!.id,
+      };
+      updateAgent.mutate(updateData);
     } else {
       createAgent.mutate(data);
     }
@@ -124,9 +156,11 @@ export const AgentForm = ({
           )}
         />
         <div className="flex gap-2">
-          <Button type="submit" disabled={createAgent.isPending}>
-            {createAgent.isPending
-              ? "Creating..."
+          <Button type="submit" disabled={isPending}>
+            {isPending
+              ? isEdit
+                ? "Updating..."
+                : "Creating..."
               : isEdit
                 ? "Update"
                 : "Create"}{" "}
