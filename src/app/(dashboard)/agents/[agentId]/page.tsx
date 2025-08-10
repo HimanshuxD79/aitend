@@ -7,7 +7,6 @@ import {
 } from "@/modules/agents/ui/views/agent-id-view";
 import { AgentsIdViewLoading } from "@/modules/agents/ui/views/agent-id-view";
 import { ErrorBoundary } from "next/dist/client/components/error-boundary";
-import { Agent } from "http";
 interface Props {
   params: Promise<{ agentId: string }>;
 }
@@ -21,7 +20,7 @@ const page = async ({ params }: Props) => {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<AgentsIdViewLoading />}>
-        <ErrorBoundary fallback={<AgentsIdViewError />}>
+        <ErrorBoundary errorComponent={AgentsIdViewError}>
           <AgentIdView agentId={agentId} />{" "}
         </ErrorBoundary>
       </Suspense>
