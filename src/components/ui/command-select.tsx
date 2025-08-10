@@ -42,13 +42,17 @@ export const CommandSelect = ({
         type="button"
         variant="outline"
         className={cn(
-          "w-full justify-between",
+          "w-full justify-between min-w-0",
           !selectedOption && "text-muted-foreground",
           className
         )}
       >
-        <div>{selectedOption ? selectedOption.children : placeholder}</div>
-        <ChevronDownIcon className="h-4 w-4" />
+        <div className="flex-1 min-w-0 text-left">
+          <div className="truncate">
+            {selectedOption ? selectedOption.children : placeholder}
+          </div>
+        </div>
+        <ChevronDownIcon className="h-4 w-4 shrink-0 ml-2" />
       </Button>
       <CommandDialog
         shouldFilter={!onSearch}
