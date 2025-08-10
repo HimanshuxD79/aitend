@@ -25,16 +25,14 @@ export const DashboardUserButton = () => {
   };
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-lg border border-transparent bg-sidebar-accent p-2 hover:bg-sidebar-accent/50">
-        <button className="flex items-center gap-2 px-2 py-1 text-sm font-medium">
-          <span className="text-sidebar-accent-foreground">
-            {data?.user?.name}
-            <br />
-            <span className="text-xs text-sidebar-accent-foreground/70">
-              {data?.user?.email}
-            </span>
+      <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg border border-transparent bg-sidebar-accent px-4 py-3 text-sm font-medium hover:bg-sidebar-accent/50">
+        <span className="text-sidebar-accent-foreground">
+          {data?.user?.name}
+          <br />
+          <span className="text-xs text-sidebar-accent-foreground/70">
+            {data?.user?.email}
           </span>
-        </button>
+        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>User Menu</DropdownMenuLabel>

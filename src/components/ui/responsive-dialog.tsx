@@ -1,5 +1,6 @@
 "use client";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+
 interface ResponsiveDialogProps {
   title: string;
   children: React.ReactNode;
@@ -20,6 +22,7 @@ interface ResponsiveDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
 export const ResponsiveDialog = ({
   title,
   children,
@@ -28,19 +31,24 @@ export const ResponsiveDialog = ({
   onOpenChange,
 }: ResponsiveDialogProps) => {
   const isMobile = useIsMobile();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Render nothing on server to prevent hydration mismatch
+  if (!isClient) {
+    return null;
+  }
 
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        {/* <DrawerTrigger asChild>
-          <button className="btn">Open Dialog</button>
-        </DrawerTrigger> */}
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>
-            {/* {description && ( */}
             <DialogDescription>{description}</DialogDescription>
-            {/* )} */}
           </DrawerHeader>
           <div className="p-4">{children}</div>
         </DrawerContent>
@@ -53,9 +61,7 @@ export const ResponsiveDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {/* {description && ( */}
           <DialogDescription>{description}</DialogDescription>
-          {/* )} */}
         </DialogHeader>
         {children}
       </DialogContent>
