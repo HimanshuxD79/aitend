@@ -70,8 +70,8 @@ export const MeetingIdView = ({ meetingId }: Props) => {
   );
 
   const handleJoinMeeting = () => {
-    // For now, this is a placeholder - you can integrate with your meeting platform
-    toast.info("Joining meeting... (Integration with meeting platform needed)");
+    // Navigate to the call view to join the meeting
+    router.push(`/call/${meetingId}`);
   };
 
   const handleCancelMeeting = async () => {
@@ -82,10 +82,8 @@ export const MeetingIdView = ({ meetingId }: Props) => {
   };
 
   const handleStartMeeting = () => {
-    // Placeholder for starting a meeting
-    toast.info(
-      "Starting meeting... (Integration with meeting platform needed)"
-    );
+    // Navigate to the call view to start the meeting
+    router.push(`/call/${meetingId}`);
   };
 
   const {
