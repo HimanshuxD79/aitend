@@ -7,7 +7,6 @@ export const createTRPCContext = cache(async (opts?: { headers?: Headers }) => {
    * @see: https://trpc.io/docs/server/context
    */
   return {
-    userId: "user_123",
     headers: opts?.headers || new Headers(),
   };
 });

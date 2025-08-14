@@ -120,11 +120,11 @@ export const MeetingForm = ({
     },
     onError: (error: Error) => {
       if (error.message.includes("UNAUTHORIZED")) {
-        toast.error("Please sign in to create meetings");
+        toast.error("Please sign in to update meetings");
       } else {
-        toast.error(`Error creating meeting: ${error.message}`);
+        toast.error(`Error updating meeting: ${error.message}`);
       }
-      console.error("Error creating agent:", error);
+      console.error("Error updating meeting:", error);
     },
   });
   const isEdit = !!initialValues?.id;
@@ -219,7 +219,7 @@ export const MeetingForm = ({
                 : isEdit
                   ? "Update"
                   : "Create"}{" "}
-              Agent
+              Meeting
             </Button>
             {onCancel && (
               <Button type="button" variant="outline" onClick={onCancel}>
