@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/hooks/use-confirm";
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header";
 import { UpdateMeetingDialog } from "../components/update-meeting-dialog";
+import { CompletedState } from "../components/completed-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -167,6 +168,11 @@ export const MeetingIdView = ({ meetingId }: Props) => {
   const isCancelled = meeting.status == "cancelled";
   const isCompleted = meeting.status == "completed";
   const isProcessing = meeting.status == "processing";
+
+  // Debug: Log current meeting status
+  console.log("Current meeting status:", meeting.status);
+  console.log("Meeting data:", meeting);
+
   return (
     <>
       <RemoveConfirmation />
@@ -287,87 +293,153 @@ export const MeetingIdView = ({ meetingId }: Props) => {
               )}
 
               {isProcessing && (
-                <span className="text-sm text-blue-500 flex items-center gap-2">
-                  <Loader2Icon className="h-4 w-4 animate-spin" />
-                  Processing...
-                </span>
+                <div className="flex gap-2">
+                  <span className="text-sm text-blue-500 flex items-center gap-2">
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(
+                          `/api/meetings/${meetingId}/complete`,
+                          {
+                            method: "POST",
+                          }
+                        );
+                        if (response.ok) {
+                          toast.success("Meeting completion triggered");
+                          // Refresh the page to see updated status
+                          window.location.reload();
+                        } else {
+                          toast.error("Failed to complete meeting");
+                        }
+                      } catch (err) {
+                        console.error("Failed to complete meeting:", err);
+                        toast.error("Failed to complete meeting");
+                      }
+                    }}
+                    className="text-xs"
+                  >
+                    Force Complete
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/debug-transcript", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({ meetingId: meetingId }),
+                        });
+                        if (response.ok) {
+                          toast.success("Test transcript added");
+                          // Refresh the page to see updated data
+                          window.location.reload();
+                        } else {
+                          toast.error("Failed to add test transcript");
+                        }
+                      } catch (err) {
+                        console.error("Failed to add test transcript:", err);
+                        toast.error("Failed to add test transcript");
+                      }
+                    }}
+                    className="text-xs"
+                  >
+                    Add Test Transcript
+                  </Button>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border">
-          <div className="px-4 py-5 gap-y-5 flex flex-col">
-            <div className="flex items-center gap-x-3">
-              <h2 className="text-lg font-medium">{meeting.name}</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-semibold text-gray-700">Meeting Details</h3>
-                <p className="text-gray-600">ID: {meetingId}</p>
-                <p className="text-gray-600">Status: {meeting.status}</p>
-                {meeting.summary && (
-                  <p className="text-gray-600">Summary: {meeting.summary}</p>
-                )}
-                {meeting.startedAt && (
-                  <p className="text-gray-600">
-                    Started: {new Date(meeting.startedAt).toLocaleString()}
-                  </p>
-                )}
-                {meeting.endedAt && (
-                  <p className="text-gray-600">
-                    Ended: {new Date(meeting.endedAt).toLocaleString()}
-                  </p>
-                )}
-                {meeting.duration && (
-                  <p className="text-gray-600">
-                    Duration: {Math.round(meeting.duration / 60)} minutes
-                  </p>
-                )}
+        {/* Show CompletedState component for completed meetings */}
+        {isCompleted || (isProcessing && meeting.endedAt) ? (
+          <CompletedState data={meeting} />
+        ) : (
+          <div className="bg-white rounded-lg border">
+            <div className="px-4 py-5 gap-y-5 flex flex-col">
+              <div className="flex items-center gap-x-3">
+                <h2 className="text-lg font-medium">{meeting.name}</h2>
               </div>
-              {meeting.agents && (
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h3 className="font-semibold text-gray-700">
-                    Agent Information
+                    Meeting Details
                   </h3>
-                  <p className="text-gray-600">Agent: {meeting.agents.name}</p>
-                  <p className="text-gray-600">
-                    Instructions: {meeting.agents.instructions}
-                  </p>
+                  <p className="text-gray-600">ID: {meetingId}</p>
+                  <p className="text-gray-600">Status: {meeting.status}</p>
+                  {meeting.summary && (
+                    <p className="text-gray-600">Summary: {meeting.summary}</p>
+                  )}
+                  {meeting.startedAt && (
+                    <p className="text-gray-600">
+                      Started: {new Date(meeting.startedAt).toLocaleString()}
+                    </p>
+                  )}
+                  {meeting.endedAt && (
+                    <p className="text-gray-600">
+                      Ended: {new Date(meeting.endedAt).toLocaleString()}
+                    </p>
+                  )}
+                  {meeting.duration && (
+                    <p className="text-gray-600">
+                      Duration: {Math.round(meeting.duration / 60)} minutes
+                    </p>
+                  )}
+                </div>
+                {meeting.agents && (
+                  <div>
+                    <h3 className="font-semibold text-gray-700">
+                      Agent Information
+                    </h3>
+                    <p className="text-gray-600">
+                      Agent: {meeting.agents.name}
+                    </p>
+                    <p className="text-gray-600">
+                      Instructions: {meeting.agents.instructions}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {(meeting.transcriptUrl || meeting.recordingUrl) && (
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-700">Resources</h3>
+                  <div className="flex gap-4">
+                    {meeting.transcriptUrl && (
+                      <a
+                        href={meeting.transcriptUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-700 underline"
+                      >
+                        View Transcript
+                      </a>
+                    )}
+                    {meeting.recordingUrl && (
+                      <a
+                        href={meeting.recordingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-700 underline"
+                      >
+                        View Recording
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-
-            {(meeting.transcriptUrl || meeting.recordingUrl) && (
-              <div className="mt-4">
-                <h3 className="font-semibold text-gray-700">Resources</h3>
-                <div className="flex gap-4">
-                  {meeting.transcriptUrl && (
-                    <a
-                      href={meeting.transcriptUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-700 underline"
-                    >
-                      View Transcript
-                    </a>
-                  )}
-                  {meeting.recordingUrl && (
-                    <a
-                      href={meeting.recordingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-700 underline"
-                    >
-                      View Recording
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
-        </div>
+        )}
 
         {/* Debug JSON - Remove this when you're satisfied with the UI */}
         <details className="mt-4">
