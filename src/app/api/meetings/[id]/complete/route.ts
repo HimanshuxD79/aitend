@@ -3,10 +3,10 @@ import { inngest } from "@/inngest/client";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const meetingId = params.id;
+    const { id: meetingId } = await params;
 
     console.log("Manual completion triggered for meeting:", meetingId);
 

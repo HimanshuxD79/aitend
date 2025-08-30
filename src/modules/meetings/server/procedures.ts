@@ -14,7 +14,6 @@ import {
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { meetingsInsertSchema } from "../schemas";
-// import { Search } from "lucide-react";
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
@@ -26,9 +25,7 @@ import { meetingsUpdateSchema } from "../schemas";
 import { MeetingStatus, StreamTranscriptItem } from "../types";
 import { streamVideo } from "@/lib/stream-video";
 import { generateAvatarUri } from "@/lib/avatar";
-import { useState } from "react";
 import { streamChat } from "@/lib/stream-chat";
-import { role } from "@stream-io/video-react-sdk";
 import OpenAI from "openai";
 
 const openai = new OpenAI({

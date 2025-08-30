@@ -4,8 +4,6 @@ import { MeetingsViewLoading } from "@/modules/meetings/ui/views/meetings-view";
 import { trpc } from "@/trpc/server";
 import { getQueryClient } from "@/trpc/server";
 import { MeetingsListHeader } from "@/modules/meetings/ui/components/meetings-list-header";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";

@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import type { Channel as StreamChanel } from "stream-chat";
 import {
@@ -12,7 +12,6 @@ import {
 } from "stream-chat-react";
 import { useTRPC } from "@/trpc/client";
 import { LoadingState } from "@/components/ui/loading-state";
-import { imageConfigDefault } from "next/dist/shared/lib/image-config";
 interface ChatUIProps {
   meetingId: string;
   meetingName: string;
@@ -31,14 +30,14 @@ export const ChatUI = ({
   const { mutateAsync: generateChatToken } = useMutation(
     trpc.meetings.generateChatToken.mutationOptions()
   );
-  const [channel, setChannel] = useState<StreamChanel | null>(null);
+  const [channel, setChannel] = useState<StreamChanel | undefined>(undefined);
   const client = useCreateChatClient({
     apiKey: process.env.NEXT_PUBLIC_STREAM_CHAT_API_KEY || "",
     tokenOrProvider: generateChatToken,
     userData: {
       id: userId,
       name: userName,
-      image: userImage || imageConfigDefault,
+      image: userImage,
     },
   });
   useEffect(() => {

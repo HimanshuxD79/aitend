@@ -1,5 +1,5 @@
 "use client";
-import { email, set, z } from "zod";
+import { z } from "zod";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import { FaGithub, FaGoogle } from "react-icons/fa";
+import Image from "next/image";
 import {
   Form,
   FormControl,
@@ -20,7 +21,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Fa } from "zod/v4/locales";
 // import { PassThrough } from "stream";
 
 const formschema = z.object({
@@ -42,7 +42,7 @@ export const SignInView = () => {
   const onSubmit = (data: z.infer<typeof formschema>) => {
     setError(null);
     setPending(true);
-    const { error } = authClient.signIn.email(
+    authClient.signIn.email(
       {
         email: data.email,
         password: data.password,
@@ -164,7 +164,7 @@ export const SignInView = () => {
                 </div>
                 <div className="text-center text-sm">
                   <p className="text-muted-foreground">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link
                       href="/sign-up"
                       className="underline underline-offset-4"
@@ -178,7 +178,7 @@ export const SignInView = () => {
           </Form>
 
           <div className="bg-radial from-neutral-800 to-black relative hidden md:flex flex-col gap-y-4 items-center justify-center">
-            <img src="/logo2.svg" alt="Image" className="h-[150px] w-[150px]" />
+            <Image src="/logo2.svg" alt="Image" width={150} height={150} />
             <p className="text-2xl font-semibold text-white">AiTend </p>
           </div>
         </CardContent>
