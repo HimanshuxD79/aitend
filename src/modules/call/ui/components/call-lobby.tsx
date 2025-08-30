@@ -25,7 +25,10 @@ const DisabledVideoPreview = () => {
           name: data?.user.name ?? "",
           image:
             data?.user.image ??
-            generateAvatarUri({ seed: data?.user.name, variant: "initials" }),
+            generateAvatarUri({
+              seed: data?.user.name ?? "Anonymous",
+              variant: "initials",
+            }),
         } as StreamVideoParticipant
       }
     />

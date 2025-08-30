@@ -1,5 +1,5 @@
 "use client";
-import { email, set, z } from "zod";
+import { z } from "zod";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import { FaGithub, FaGoogle } from "react-icons/fa";
+import Image from "next/image";
 import {
   Form,
   FormControl,
@@ -49,7 +50,7 @@ export const SignUpView = () => {
   const onSubmit = (data: z.infer<typeof formschema>) => {
     setError(null);
     setPending(true);
-    const { error } = authClient.signUp.email(
+    authClient.signUp.email(
       {
         name: data.name,
         email: data.email,
@@ -94,7 +95,7 @@ export const SignUpView = () => {
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col items-center text-center">
                   <h1 className="text-2xl font-bold">
-                    Let's get you signed up
+                    Let&apos;s get you signed up
                   </h1>
                   <p className="text-muted-forground text-balance">
                     Create a new account
@@ -226,7 +227,7 @@ export const SignUpView = () => {
           </Form>
 
           <div className="bg-radial from-neutral-800 to-black relative hidden md:flex flex-col gap-y-4 items-center justify-center">
-            <img src="/logo2.svg" alt="Image" className="h-[150px] w-[150px]" />
+            <Image src="/logo2.svg" alt="Image" width={150} height={150} />
             <p className="text-2xl font-semibold text-white">AI-TEND </p>
           </div>
         </CardContent>

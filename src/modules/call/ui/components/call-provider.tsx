@@ -2,8 +2,6 @@
 import { LoaderIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { generateAvatarUri } from "@/lib/avatar";
-import { auth } from "@/lib/auth";
-import { Ca } from "zod/v4/locales";
 import { CallConnect } from "./call-connect";
 interface Props {
   meetingId: string;
